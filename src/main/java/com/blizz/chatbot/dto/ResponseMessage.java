@@ -3,8 +3,9 @@ package com.blizz.chatbot.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.Map;
 
 @Getter
 @ToString
@@ -17,7 +18,7 @@ public class ResponseMessage extends RequestMessage {
     @JsonCreator
     public ResponseMessage(@JsonProperty("command") final Command command,
                            @JsonProperty("request_id") final Integer requestId,
-                           @JsonProperty("payload") final Payload payload,
+                           @JsonProperty("payload") final Map<Payload, Object> payload,
                            @JsonProperty("status") final Status status) {
         super(command, requestId, payload);
         this.status = status;

@@ -1,22 +1,25 @@
 package com.blizz.chatbot.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Data
-@Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Payload {
+public enum Payload {
 
-    @JsonProperty("api_key")
-    private final String apiKey;
+    API_KEY("api_key"),
+    CHANNEL_NAME("channel"),
+    USER_ACCOUNT_NAME("toon_name"),
+    USER_FLAG("flag"),
+    USER_CHAT_ID("user_id"),
+    MESSAGE_TYPE("type");
 
-    @JsonCreator
-    public Payload(@JsonProperty("api_key") final String apiKey) {
-        this.apiKey = apiKey;
+
+    private final String value;
+
+    Payload(final String value) {
+        this.value = value;
     }
 
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
 }
