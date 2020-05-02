@@ -44,4 +44,11 @@ public class RequestMessage {
                 .command(Command.CONNECTION)
                 .build();
     }
+
+    public static RequestMessage withMessage(final String message) {
+        return RequestMessage.builder()
+                .command(Command.MESSAGE_SENDING)
+                .payload(Map.of(PayloadType.MESSAGE, message))
+                .build();
+    }
 }
