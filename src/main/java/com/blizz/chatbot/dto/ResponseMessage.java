@@ -18,7 +18,7 @@ public class ResponseMessage extends RequestMessage {
     @JsonCreator
     public ResponseMessage(@JsonProperty("command") final Command command,
                            @JsonProperty("request_id") final Integer requestId,
-                           @JsonProperty("payload") final Map<Payload, Object> payload,
+                           @JsonProperty("payload") final Map<PayloadType, Object> payload,
                            @JsonProperty("status") final Status status) {
         super(command, requestId, payload);
         this.status = status;

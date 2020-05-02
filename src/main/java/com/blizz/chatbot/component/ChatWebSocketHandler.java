@@ -1,8 +1,11 @@
 package com.blizz.chatbot.component;
 
-import com.blizz.chatbot.service.ApiRequestsService;
-import lombok.RequiredArgsConstructor;
+import com.blizz.chatbot.dto.RequestMessage;
+import com.blizz.chatbot.service.MessageMappingService;
+import com.blizz.chatbot.service.ResponseProcessingService;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
@@ -10,14 +13,24 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class ChatWebSocketHandler implements WebSocketHandler {
 
-    private final ApiRequestsService apiRequestsService;
+    private final ResponseProcessingService responseProcessingService;
+    private final MessageMappingService messageMappingService;
+    private final String blizzardApiKey;
+
+    public ChatWebSocketHandler(final ResponseProcessingService responseProcessingService,
+                                final MessageMappingService messageMappingService,
+                                @Value("${blizzard.api.key}") final String blizzardApiKey) {
+        this.responseProcessingService = responseProcessingService;
+        this.messageMappingService = messageMappingService;
+        this.blizzardApiKey = blizzardApiKey;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sendMessage(session, apiRequestsService.getAuthenticationRequest());
+        final var authenticationRequest = messageMappingService.mapToJson(RequestMessage.ofAuthentication(blizzardApiKey));
+        sendMessage(session, authenticationRequest);
     }
 
     @Override
@@ -25,10 +38,11 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         System.out.println("HANDLE MESSAGE");
         System.out.println(message.getPayload().toString()); // TODO: RM this.
 
-        apiRequestsService.processMessage(message.getPayload().toString())
+        final var responseMessage = messageMappingService.mapToResponseMessage(message.getPayload().toString());
+
+        responseProcessingService.process(responseMessage)
+                .map(messageMappingService::mapToJson)
                 .ifPresent(response -> sendMessage(session, response));
-
-
     }
 
     @Override
